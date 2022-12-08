@@ -13,6 +13,7 @@ const userData = userArgv[0].split("--username=");
 const userName = userData[1];
 
 const { stdin: input, stdout: output } = require("node:process");
+const { readdir } = require("node:fs");
 const rl = readline.createInterface({ input, output });
 
 const greetingMessage = () =>
@@ -40,7 +41,7 @@ rl.on("line", async (input) => {
       currentPath = path.isAbsolute(newPath) ? newPath : oldPath;
     }
     try {
-      await fsPromise.access(currentPath);
+      await fsPromise.access(path.resolve(oldPath, newPath));
       currentPath = path.resolve(oldPath, newPath);
     } catch (error) {
       currentPath = oldPath;
@@ -65,6 +66,18 @@ rl.on("line", async (input) => {
       const tableData = dataFiles.concat(dataDirectory);
       console.table(tableData);
     });
+  }
+  if (input.match(/\bcat\b/)) {
+    const fileName = input.trim().split(" ")[1];
+    try {
+      const fileData = await fsPromise.readFile(
+        path.resolve(currentPath, fileName),
+        { encoding: "utf8" }
+      );
+      console.log(fileData);
+    } catch (error) {
+      console.log("wrong file");
+    }
   }
   console.log(`You are currently in ${currentPath}`);
 });
