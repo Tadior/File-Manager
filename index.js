@@ -1,7 +1,21 @@
-const readline = require("node:readline");
-const path = require("node:path");
-const fs = require("fs");
-const fsPromise = require("fs").promises;
+// const readline = require("node:readline");
+import readline from "readline";
+import { resolve, dirname } from "path";
+import path from "path";
+import * as fs from "fs";
+import * as fsPromise from "fs/promises";
+import { readdir } from "node:fs";
+import { checkExist } from "./helpers/checkExist.js";
+import { stdin, stdout } from "node:process";
+import { getDirname } from "./helpers/getDirname.js";
+const input = stdin;
+const output = stdout;
+import { pipeline } from "node:stream/promises";
+import { unlink } from "node:fs/promises";
+
+// const path = require("node:path");
+// const fs = require("fs");
+// const fsPromise = require("fs").promises;
 
 const regExp = /--username=/g;
 const userArgv = process.argv.filter((arg) => {
@@ -12,15 +26,17 @@ const userArgv = process.argv.filter((arg) => {
 const userData = userArgv[0].split("--username=");
 const userName = userData[1];
 
-const { stdin: input, stdout: output } = require("node:process");
-const { readdir } = require("node:fs");
+// const { stdin: input, stdout: output } = require("node:process");
+// const { readdir } = require("node:fs");
+// const { resolve } = require("node:path");
+// const { checkExist } = require("./helpers/checkExist");
 const rl = readline.createInterface({ input, output });
 
 const greetingMessage = () =>
   console.log(`Welcome to the File Manager, ${userName}!`);
 const exitMessage = () =>
   console.log(`Thank you for using File Manager, ${userName}, goodbye!`);
-let currentPath = path.join(__dirname);
+let currentPath = path.join(process.cwd());
 
 greetingMessage();
 
@@ -122,41 +138,22 @@ rl.on("line", async (input) => {
     });
   }
   if (input.match(/\bmv\b/)) {
-    const pathToFile = input.trim().split(" ")[1];
-    const fileName = path.basename(pathToFile);
-    const newPathValue = input.trim().split(" ")[2];
-    const newPath = path.isAbsolute(newPathValue)
-      ? newPathValue
-      : path.join(currentPath, newPathValue);
-    const readStream = fs.createReadStream(pathToFile);
-    readStream
-      .on("error", (error) => {
-        console.log("------------------------");
-        console.log(error.message);
-        readStream.destroy();
-      })
-      .on("data", (chunk) => {
-        const writeStream = fs.createWriteStream(path.join(newPath, fileName));
-        writeStream.on("error", (error) => {
-          if (error && error.message) {
-            console.log(error.message);
-          }
-          readStream.destroy();
-          writeStream.end();
-        });
-        writeStream.write(chunk);
-      })
-      .on("end", () => {
-        console.log("ended");
-        try {
-          fsPromise.rm(pathToFile);
-        } catch (error) {
-          console.log(error);
-        }
-      })
-      .on("close", (error) => {
-        console.log("destroy");
-      });
+    try {
+      const pathToFile = resolve(input.trim().split(" ")[1]);
+      const fileName = path.basename(pathToFile);
+      const pathToDest = resolve(input.trim().split(" ")[2], fileName);
+      const isFileNameExists = await checkExist(pathToFile);
+      if (!isFileNameExists) {
+        console.log("There is no file in directory!");
+        return;
+      }
+      const readStream = fs.createReadStream(pathToFile, { flags: "r" });
+      const writeStream = fs.createWriteStream(pathToDest, { flags: "wx" });
+      await pipeline(readStream, writeStream);
+      await unlink(pathToFile);
+    } catch (error) {
+      console.log("Operation failed!");
+    }
   }
   if (input.match(/\brm\b/)) {
     const pathValue = input.trim().split(" ")[1];
