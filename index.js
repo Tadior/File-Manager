@@ -10,6 +10,7 @@ import { rm } from "./fs/rm.js";
 import { ls } from "./ls/ls.js";
 import { os } from "./os/os.js";
 import { hash } from "./hash/hash.js";
+import { compress } from "./compress/compress.js";
 
 const fileManager = async () => {
   const input = stdin;
@@ -152,8 +153,16 @@ const fileManager = async () => {
         }
         break;
       }
-      case "example": {
-        if (parameters.length === 1) {
+      case "compress": {
+        if (parameters.length === 2) {
+          await compress(parameters);
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
+        break;
+      }
+      case "decompress": {
+        if (parameters.length === 2) {
         } else {
           process.stdout.write(`Invalid input\n`);
         }
