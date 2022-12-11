@@ -9,6 +9,7 @@ import { mv } from "./fs/mv.js";
 import { rm } from "./fs/rm.js";
 import { ls } from "./ls/ls.js";
 import { os } from "./os/os.js";
+import { hash } from "./hash/hash.js";
 
 const fileManager = async () => {
   const input = stdin;
@@ -30,7 +31,6 @@ const fileManager = async () => {
     process.stdout.write(
       `Thank you for using File Manager, ${userName}, goodbye!\n`
     );
-  let currentPath = path.join(process.cwd());
 
   greetingMessage();
 
@@ -49,7 +49,7 @@ const fileManager = async () => {
       }
       case "up": {
         if (parameters.length === 0) {
-          currentPath = path.join(currentPath, "..");
+          process.chdir("..");
         } else {
           process.stdout.write(`Invalid input\n`);
         }
@@ -137,6 +137,23 @@ const fileManager = async () => {
           } else {
             process.stdout.write(`Invalid input\n`);
           }
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
+        break;
+      }
+      case "hash": {
+        if (parameters.length === 1) {
+          await hash(parameters).then((result) => {
+            process.stdout.write(result);
+          });
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
+        break;
+      }
+      case "example": {
+        if (parameters.length === 1) {
         } else {
           process.stdout.write(`Invalid input\n`);
         }
