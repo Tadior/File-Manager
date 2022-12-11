@@ -8,6 +8,7 @@ import { cp } from "./fs/cp.js";
 import { mv } from "./fs/mv.js";
 import { rm } from "./fs/rm.js";
 import { ls } from "./ls/ls.js";
+import { os } from "./os/os.js";
 
 const fileManager = async () => {
   const input = stdin;
@@ -129,7 +130,16 @@ const fileManager = async () => {
         }
         break;
       }
-      case "example": {
+      case "os": {
+        if (parameters.length === 1 && typeof parameters !== "undefined") {
+          if (parameters[0].startsWith("--")) {
+            await os(parameters);
+          } else {
+            process.stdout.write(`Invalid input\n`);
+          }
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
         break;
       }
     }
