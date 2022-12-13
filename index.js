@@ -1,5 +1,5 @@
 import readline from "readline";
-import path from "path";
+import * as osNode from "os";
 import { stdin, stdout } from "node:process";
 import { add } from "./fs/add.js";
 import { cat } from "./fs/cat.js";
@@ -11,6 +11,7 @@ import { ls } from "./ls/ls.js";
 import { os } from "./os/os.js";
 import { hash } from "./hash/hash.js";
 import { compress } from "./compress/compress.js";
+import { decompress } from "./decompress.js/decompress.js";
 
 const fileManager = async () => {
   const input = stdin;
@@ -22,12 +23,18 @@ const fileManager = async () => {
       return arg;
     }
   });
+
   const userData = userArgv[0].split("--username=");
   const userName = userData[1];
   const rl = readline.createInterface({ input, output });
 
+  process.chdir(osNode.homedir());
+
   const greetingMessage = () =>
-    process.stdout.write(`Welcome to the File Manager, ${userName}!\n`);
+    process.stdout.write(
+      `Welcome to the File Manager, ${userName}!\nYou are currently in ${process.cwd()}\n`
+    );
+
   const exitMessage = () =>
     process.stdout.write(
       `Thank you for using File Manager, ${userName}, goodbye!\n`
@@ -163,13 +170,13 @@ const fileManager = async () => {
       }
       case "decompress": {
         if (parameters.length === 2) {
+          await decompress(parameters);
         } else {
           process.stdout.write(`Invalid input\n`);
         }
         break;
       }
     }
-
     console.log(`You are currently in ${process.cwd()}`);
   });
   process.on("exit", () => {
