@@ -88,7 +88,7 @@ const fileManager = async () => {
       }
       case "cat": {
         if (parameters.length === 1) {
-          cat(parameters).then((result) => {
+          await cat(parameters).then((result) => {
             process.stdout.write(result);
           });
         } else {
