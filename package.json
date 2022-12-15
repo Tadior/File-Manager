@@ -1,0 +1,21 @@
+{
+  "name": "file-manager",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tadior/File-Manager.git"
+  },
+  "author": "Dmitriy Zamulin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tadior/File-Manager/issues"
+  },
+  "homepage": "https://github.com/Tadior/File-Manager#readme"
+}
